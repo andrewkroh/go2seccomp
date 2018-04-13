@@ -131,8 +131,21 @@ func parseFunctionName(instruction string) string {
 
 func isSyscallPkgCall(arch specs.Arch, instruction string) bool {
 	j := getCallOpByArch(arch)
-	return strings.Contains(instruction, j+"syscall.Syscall(SB)") || strings.Contains(instruction, j+"syscall.Syscall6(SB)") ||
-		strings.Contains(instruction, j+"syscall.RawSyscall(SB)") || strings.Contains(instruction, j+"syscall.RawSyscall6(SB)")
+	if strings.Contains(instruction, j) {
+	return strings.Contains(instruction, "syscall.Syscall(SB)") ||
+		strings.Contains(instruction, "syscall.Syscall6(SB)") ||
+		strings.Contains(instruction, "syscall.RawSyscall(SB)") ||
+		strings.Contains(instruction, "syscall.RawSyscall6(SB)") ||
+		strings.Contains(instruction, "unix.RawSyscall(SB)") ||
+		strings.Contains(instruction, "unix.RawSyscall6(SB)") ||
+	    strings.Contains(instruction, "unix.RawSyscallNoError(SB)") ||
+		strings.Contains(instruction, "unix.Syscall(SB)") ||
+		strings.Contains(instruction, "unix.Syscall6(SB)") ||
+		strings.Contains(instruction, "unix.Syscall9(SB)") ||
+		strings.Contains(instruction, "unix.SyscallNoError(SB)")
+	}
+
+	return false
 }
 
 func isRuntimeSyscall(arch specs.Arch, instruction, currentFunction string) bool {
@@ -156,32 +169,6 @@ func isRuntimeSyscall(arch specs.Arch, instruction, currentFunction string) bool
 // Even if they are not found in the binary, they are needed for starting the container
 func getDefaultSyscalls(arch specs.Arch) map[int64]bool {
 	syscalls := make(map[int64]bool)
-	switch arch {
-
-	case specs.ArchX86_64:
-		// futex
-		syscalls[202] = true
-		// stat
-		syscalls[4] = true
-		// execve
-		syscalls[59] = true
-	case specs.ArchX86:
-		// futex
-		syscalls[240] = true
-		// stat
-		syscalls[106] = true
-		// execve
-		syscalls[11] = true
-	case specs.ArchARM:
-		// futex
-		syscalls[240] = true
-		// stat
-		syscalls[106] = true
-		// execve
-		syscalls[11] = true
-	default:
-		log.Fatalln(arch, "not supported")
-	}
-
 	return syscalls
+
 }
